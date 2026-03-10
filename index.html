@@ -83,13 +83,13 @@
             <!-- Swap -->
             <div id="content5" class="hidden">
                 <div class="glass p-6 rounded-3xl">
-                    <h2 class="text-2xl font-bold mb-4 text-center">🔄 博饼 Swap（MXT ↔ 底池币）</h2>
+                    <h2 class="text-2xl font-bold mb-4 text-center">🔄 博饼 Swap（MXT ↔ USDT）</h2>
                     <select id="swapDirection" onchange="updateSwapQuote()" class="bg-white/10 p-3 rounded-2xl text-lg w-full mb-4">
-                        <option value="0">MXT → 底池币</option>
-                        <option value="1">底池币 → MXT</option>
+                        <option value="0">MXT → USDT</option>
+                        <option value="1">USDT → MXT</option>
                     </select>
                     <input id="swapAmount" type="number" placeholder="输入数量" class="w-full bg-white/10 p-5 rounded-3xl text-3xl mb-4" onkeyup="updateSwapQuote()">
-                    <div class="text-center text-sm opacity-75 mb-6">≈ <span id="swapOutput" class="text-emerald-400 font-bold text-2xl">0</span> <span id="toSymbol" class="font-bold">底池币</span></div>
+                    <div class="text-center text-sm opacity-75 mb-6">≈ <span id="swapOutput" class="text-emerald-400 font-bold text-2xl">0</span> <span id="toSymbol" class="font-bold">USDT</span></div>
                     <button onclick="executeSwap()" class="w-full bg-gradient-to-r from-pink-500 to-violet-500 py-6 rounded-3xl font-bold text-2xl">🚀 执行 Swap</button>
                 </div>
             </div>
@@ -336,7 +336,7 @@
         try {
             const out = await routerContract.getAmountsOut(ethers.parseUnits(amt, 18), path);
             document.getElementById("swapOutput").textContent = parseFloat(ethers.formatUnits(out[1], 18)).toFixed(4);
-            document.getElementById("toSymbol").textContent = dir === "0" ? "底池币" : "MXT";
+            document.getElementById("toSymbol").textContent = dir === "0" ? "USDT" : "MXT";
         } catch(e) { document.getElementById("swapOutput").textContent = "0"; }
     }
 
