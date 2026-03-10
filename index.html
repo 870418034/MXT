@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MXT打工人帝国 v2.3.1 - Swap 已修复</title>
+    <title>MXT打工人帝国 v2.3.2 - 钱包连接已修复</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <style>
@@ -19,10 +19,9 @@
 <body class="min-h-screen p-4">
 <div class="max-w-md mx-auto glass rounded-3xl shadow-2xl overflow-hidden">
 
-    <!-- 头部 -->
     <div class="bg-gradient-to-r from-yellow-400 to-amber-500 text-black p-6 text-center">
-        <h1 class="text-4xl font-bold">🏢 MXT打工人帝国</h1>
-        <p class="text-lg mt-1"MXT交易所·链游①</p>
+        <h1 class="text-4xl font-bold">🏢 MXT交易所打工人帝国</h1>
+        <p class="text-lg mt-1">MXT交易所生态·链游①</p>
     </div>
 
     <div class="p-6">
@@ -31,20 +30,12 @@
             连接钱包开始打工
         </button>
 
-        <!-- 主游戏界面 -->
         <div id="gameUI" class="hidden mt-6">
-
-            <!-- 授权 + 充值按钮 -->
             <button id="approveBtn" onclick="approveToken()" 
-                    class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl mb-3 text-lg flex items-center justify-center gap-2">
-                🔓 一键授权 MXT 给合约
-            </button>
+                    class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl mb-3 text-lg">🔓 一键授权 MXT 给合约</button>
             <button onclick="fundPrizePoolPrompt()" 
-                    class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-2xl mb-6 text-lg flex items-center justify-center gap-2">
-                💰 给奖池充值（解决领工资失败）
-            </button>
+                    class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-2xl mb-6 text-lg">💰 给奖池充值（解决领工资失败）</button>
 
-            <!-- 标签页 -->
             <div class="flex border-b border-white/30 mb-4 text-sm overflow-x-auto">
                 <button onclick="switchTab(0)" class="tab px-4 py-2 tab-active" id="tab0">仪表盘</button>
                 <button onclick="switchTab(1)" class="tab px-4 py-2" id="tab1">抽卡</button>
@@ -56,45 +47,30 @@
 
             <!-- 仪表盘 -->
             <div id="content0">
-                <div class="glass p-5 rounded-2xl mb-4">
-                    <p class="text-sm opacity-75">我的总产出速率</p>
-                    <p id="rateDisplay" class="text-5xl font-bold text-emerald-400">0 MXT/s</p>
-                </div>
-                <div class="glass p-5 rounded-2xl mb-4">
-                    <p class="text-sm opacity-75">待领工资</p>
-                    <p id="pendingDisplay" class="text-4xl font-bold text-amber-400">0 MXT</p>
-                </div>
-                <div class="glass p-4 text-xs mb-4">
-                    <p class="flex justify-between"><span>当前奖池余额</span><span id="poolBalance" class="text-emerald-400 font-bold">0 MXT</span></p>
-                </div>
-                <button onclick="claimRewards()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-6 rounded-3xl font-bold text-2xl">
-                    💰 下班领工资
-                </button>
+                <div class="glass p-5 rounded-2xl mb-4"><p class="text-sm opacity-75">我的总产出速率</p><p id="rateDisplay" class="text-5xl font-bold text-emerald-400">0 MXT/s</p></div>
+                <div class="glass p-5 rounded-2xl mb-4"><p class="text-sm opacity-75">待领工资</p><p id="pendingDisplay" class="text-4xl font-bold text-amber-400">0 MXT</p></div>
+                <div class="glass p-4 text-xs mb-4"><p class="flex justify-between"><span>当前奖池余额</span><span id="poolBalance" class="text-emerald-400 font-bold">0 MXT</span></p></div>
+                <button onclick="claimRewards()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-6 rounded-3xl font-bold text-2xl">💰 下班领工资</button>
             </div>
 
             <!-- 抽卡页 -->
             <div id="content1" class="hidden">
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <button onclick="drawCard()" class="bg-red-600 hover:bg-red-700 py-6 rounded-3xl font-bold text-xl">🎟️ 单抽<br><span class="text-sm">(5000 MXT)</span></button>
-                    <button onclick="drawTenCards()" class="bg-purple-600 hover:bg-purple-700 py-6 rounded-3xl font-bold text-xl">🎟️🎟️ 十连<br><span class="text-sm">(45000 9折)</span></button>
-                    <button onclick="drawHundredCards()" class="bg-blue-600 hover:bg-blue-700 py-6 rounded-3xl font-bold text-xl">💯 百连抽<br><span class="text-sm">(400000 8折)</span></button>
-                    <button onclick="drawThousandCards()" class="bg-indigo-600 hover:bg-indigo-700 py-6 rounded-3xl font-bold text-xl">🔟 千连抽<br><span class="text-sm">(3500000 7折)</span></button>
+                    <button onclick="drawCard()" class="bg-red-600 hover:bg-red-700 py-6 rounded-3xl font-bold text-xl">🎟️ 单抽<br><span class="text-sm">(5000)</span></button>
+                    <button onclick="drawTenCards()" class="bg-purple-600 hover:bg-purple-700 py-6 rounded-3xl font-bold text-xl">🎟️🎟️ 十连<br><span class="text-sm">(45000)</span></button>
+                    <button onclick="drawHundredCards()" class="bg-blue-600 hover:bg-blue-700 py-6 rounded-3xl font-bold text-xl">💯 百连<br><span class="text-sm">(400000)</span></button>
+                    <button onclick="drawThousandCards()" class="bg-indigo-600 hover:bg-indigo-700 py-6 rounded-3xl font-bold text-xl">🔟 千连<br><span class="text-sm">(3500000)</span></button>
                 </div>
-                <div class="glass p-5 rounded-2xl text-xs">
-                    <p class="font-bold mb-2">抽卡概率公示</p>
-                    <div id="probList" class="space-y-1 text-amber-200"></div>
-                </div>
+                <div class="glass p-5 rounded-2xl text-xs"><p class="font-bold mb-2">抽卡概率公示</p><div id="probList" class="space-y-1 text-amber-200"></div></div>
             </div>
 
             <!-- 办公室 -->
             <div id="content2" class="hidden grid grid-cols-2 gap-4" style="max-height:420px;overflow-y:auto"></div>
 
-            <!-- 我的收藏 -->
-            <div id="content3" class="hidden">
-                <div id="collectionGrid" class="grid grid-cols-4 gap-3"></div>
-            </div>
+            <!-- 收藏 -->
+            <div id="content3" class="hidden"><div id="collectionGrid" class="grid grid-cols-4 gap-3"></div></div>
 
-            <!-- 每日福利 -->
+            <!-- 每日 -->
             <div id="content4" class="hidden text-center">
                 <div class="glass p-8 rounded-3xl">
                     <div class="text-6xl mb-4">📅</div>
@@ -104,26 +80,17 @@
                 </div>
             </div>
 
-            <!-- Swap 页面 -->
+            <!-- Swap -->
             <div id="content5" class="hidden">
                 <div class="glass p-6 rounded-3xl">
-                    <h2 class="text-2xl font-bold mb-4 text-center">🔄 博饼 Swap（MXT ↔ USDT）</h2>
-                    <div class="flex justify-between items-center mb-4">
-                        <select id="swapDirection" onchange="updateSwapQuote()" class="bg-white/10 p-3 rounded-2xl text-lg">
-                            <option value="0">MXT → USDT</option>
-                            <option value="1">USDT → MXT</option>
-                        </select>
-                    </div>
-                    <input id="swapAmount" type="number" placeholder="输入数量" 
-                           class="w-full bg-white/10 p-5 rounded-3xl text-3xl mb-4" onkeyup="updateSwapQuote()">
-                    <div class="text-center text-sm opacity-75 mb-6">
-                        ≈ <span id="swapOutput" class="text-emerald-400 font-bold text-2xl">0</span> 
-                        <span id="toSymbol" class="font-bold">USDT</span>
-                    </div>
-                    <button onclick="executeSwap()" 
-                            class="w-full bg-gradient-to-r from-pink-500 to-violet-500 py-6 rounded-3xl font-bold text-2xl">
-                        🚀 执行 Swap
-                    </button>
+                    <h2 class="text-2xl font-bold mb-4 text-center">🔄 博饼 Swap（MXT ↔ 底池币）</h2>
+                    <select id="swapDirection" onchange="updateSwapQuote()" class="bg-white/10 p-3 rounded-2xl text-lg w-full mb-4">
+                        <option value="0">MXT → 底池币</option>
+                        <option value="1">底池币 → MXT</option>
+                    </select>
+                    <input id="swapAmount" type="number" placeholder="输入数量" class="w-full bg-white/10 p-5 rounded-3xl text-3xl mb-4" onkeyup="updateSwapQuote()">
+                    <div class="text-center text-sm opacity-75 mb-6">≈ <span id="swapOutput" class="text-emerald-400 font-bold text-2xl">0</span> <span id="toSymbol" class="font-bold">底池币</span></div>
+                    <button onclick="executeSwap()" class="w-full bg-gradient-to-r from-pink-500 to-violet-500 py-6 rounded-3xl font-bold text-2xl">🚀 执行 Swap</button>
                 </div>
             </div>
 
@@ -132,7 +99,7 @@
     </div>
 </div>
 
-<!-- 抽卡成功弹窗 -->
+<!-- 弹窗 -->
 <div id="successModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
     <div class="modal glass max-w-xs w-full mx-4 p-8 rounded-3xl text-center">
         <div id="roleIcon" class="text-8xl mb-4">🎉</div>
@@ -143,21 +110,21 @@
 </div>
 
 <script>
-    // ==================== 配置 ====================
-    const CONTRACT_ADDR = "0x9182d8e172df1de8b4d290220aef921fc376e6a5";   // ←←← 改成你的合约地址
+    // ==================== 配置（必须修改） ====================
+    const CONTRACT_ADDR = "0x8252429ffF9D80E9ebb4d8bA79D6427DD5bA1304";   // ←←← 改成你的最新合约地址
     const TOKEN_ADDR = "0xe73ABa3306e912eD507C55B440C75bB4827183Df";
     const ROUTER_ADDR = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
     const POOL_TOKEN_ADDR = "0x30189dB4f47A89Ea521358364939f49C2751CAb6";
     const CHAIN_ID = 56;
 
-    // ==================== 修复后的完整 ERC20 ABI ====================
+    // ==================== ABI（已修复 allowance） ====================
     const TOKEN_ABI = [
         {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
         {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
         {"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}
     ];
 
-    const CONTRACT_ABI = [ /* 保持你上个版本的 ABI（包含 drawHundredCards 等） */ 
+    const CONTRACT_ABI = [
         {"inputs":[],"name":"drawCard","outputs":[],"stateMutability":"nonpayable","type":"function"},
         {"inputs":[],"name":"drawTenCards","outputs":[],"stateMutability":"nonpayable","type":"function"},
         {"inputs":[],"name":"drawHundredCards","outputs":[],"stateMutability":"nonpayable","type":"function"},
@@ -179,7 +146,7 @@
         {"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"}],"name":"getAmountsOut","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"view","type":"function"}
     ];
 
-    // ==================== 数据 & 全局变量（保持不变） ====================
+    // ==================== 数据 ====================
     const roleNames = ["实习生","打工人","程序员","销售精英","项目经理","部门主管","老板","CEO"];
     const roleEmojis = ["👶","🧑‍💼","💻","📈","📋","👔","🧔","👑"];
     const roleProbs = ["40%","30%","15%","8%","4%","2%","0.5%","0.5%"];
@@ -187,16 +154,224 @@
     const toolCosts = [10000,25000,40000,60000,120000,250000];
     const toolRates = [2,5,10,15,25,50];
 
+    // ==================== 全局变量 ====================
     let provider, signer, contract, tokenContract, routerContract, poolTokenContract, userAddress;
     let updateInterval;
 
-    // ==================== 其余所有函数（完全一样，只是 ABI 已修复） ====================
-    // （为了节省篇幅，这里省略了 connectWallet、switchTab、抽卡、claimRewards、updateSwapQuote 等函数）
-    // 你可以直接把上一个版本的 <script> 内容复制过来，只替换上面的 TOKEN_ABI 部分即可。
+    function setStatus(msg, color = "amber") {
+        document.getElementById("status").innerHTML = `<span class="text-${color}-300">${msg}</span>`;
+    }
 
-    // 重要：我已把完整修复版打包好，你只需要把上面的 TOKEN_ABI 替换进你现有的 index.html 即可。
+    async function ensureCorrectChain() {
+        const network = await provider.getNetwork();
+        if (network.chainId !== CHAIN_ID) {
+            alert("请切换到 BSC 主网 (Chain ID 56)！");
+            return false;
+        }
+        return true;
+    }
 
-    console.log("%c✅ Swap 已修复！请刷新页面重新测试", "color:#10b981;font-size:18px;font-weight:bold");
+    function switchTab(n) {
+        for (let i = 0; i < 6; i++) {
+            document.getElementById(`content${i}`).classList.add("hidden");
+            const t = document.getElementById(`tab${i}`);
+            if (t) t.classList.remove("tab-active");
+        }
+        document.getElementById(`content${n}`).classList.remove("hidden");
+        const active = document.getElementById(`tab${n}`);
+        if (active) active.classList.add("tab-active");
+
+        if (n === 2) updateTools();
+        if (n === 3) updateCollection();
+        if (n === 4) updateDailyStatus();
+        if (n === 5) updateSwapQuote();
+    }
+
+    // ==================== 连接钱包（核心修复） ====================
+    async function connectWallet() {
+        if (!window.ethereum) return alert("请安装 MetaMask 或 Trust Wallet！");
+        try {
+            provider = new ethers.BrowserProvider(window.ethereum);
+            signer = await provider.getSigner();
+            userAddress = await signer.getAddress();
+
+            contract = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, signer);
+            tokenContract = new ethers.Contract(TOKEN_ADDR, TOKEN_ABI, signer);
+            routerContract = new ethers.Contract(ROUTER_ADDR, ROUTER_ABI, signer);
+            poolTokenContract = new ethers.Contract(POOL_TOKEN_ADDR, TOKEN_ABI, signer);
+
+            contract.on("CardDrawn", (player, roleName, rate) => {
+                if (player.toLowerCase() === userAddress.toLowerCase()) showSuccessModal(roleName, rate);
+            });
+
+            await ensureCorrectChain();
+
+            document.getElementById("connectBtn").classList.add("hidden");
+            document.getElementById("gameUI").classList.remove("hidden");
+            document.getElementById("approveBtn").classList.remove("hidden");
+
+            setStatus("✅ 连接成功！请先授权并充值奖池", "emerald");
+            startRealTimeUpdate();
+            switchTab(0);
+            initProbList();
+        } catch (e) {
+            console.error(e);
+            setStatus("连接失败：" + e.message, "red");
+            alert("连接失败，请刷新页面重试或检查钱包是否解锁");
+        }
+    }
+
+    function initProbList() {
+        let html = "";
+        for (let i = 0; i < 8; i++) {
+            html += `<div class="flex justify-between"><span>${roleEmojis[i]} ${roleNames[i]}</span><span>${roleProbs[i]}</span></div>`;
+        }
+        document.getElementById("probList").innerHTML = html;
+    }
+
+    function startRealTimeUpdate() {
+        if (updateInterval) clearInterval(updateInterval);
+        updateInterval = setInterval(async () => {
+            if (!contract) return;
+            try {
+                const rate = await contract.getMyProductionRate();
+                const pending = await contract.getPendingRewards(userAddress);
+                document.getElementById("rateDisplay").textContent = (Number(rate) / 1e18).toFixed(2) + " MXT/s";
+                document.getElementById("pendingDisplay").textContent = (Number(pending) / 1e18).toFixed(4) + " MXT";
+                const pool = await contract.getPrizePoolBalance();
+                document.getElementById("poolBalance").textContent = (Number(pool) / 1e18).toFixed(0) + " MXT";
+            } catch(e){}
+        }, 1500);
+    }
+
+    // ==================== 其他所有函数（完整） ====================
+    async function updateCollection() {
+        const counts = await contract.getMyRoleCounts();
+        let html = "";
+        for (let i = 0; i < 8; i++) {
+            html += `<div class="glass rounded-2xl p-3 text-center card"><div class="text-4xl">${roleEmojis[i]}</div><div class="text-xs mt-1 opacity-75">${roleNames[i]}</div><div class="text-2xl font-bold text-amber-400">${counts[i]}</div></div>`;
+        }
+        document.getElementById("collectionGrid").innerHTML = html;
+    }
+
+    async function updateTools() {
+        const counts = await contract.getMyToolCounts();
+        let html = "";
+        for (let i = 0; i < 6; i++) {
+            html += `<div class="glass rounded-3xl p-4 card"><div class="text-3xl mb-2">🛠️</div><div class="font-bold">${toolNames[i]}</div><div class="text-xs opacity-75">等级 ${counts[i]} • +${toolRates[i]} MXT/s</div><button onclick="buyTool(${i})" class="mt-3 w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-2xl text-sm">购买 ${toolCosts[i]} MXT</button></div>`;
+        }
+        document.getElementById("content2").innerHTML = html;
+    }
+
+    async function updateDailyStatus() {
+        const last = await contract.getMyLastDailyClaim();
+        const canClaim = Date.now()/1000 > last + 86400;
+        document.getElementById("dailyStatus").textContent = canClaim ? "可领取 10000 MXT" : "今日已签到";
+        document.getElementById("dailyBtn").disabled = !canClaim;
+    }
+
+    async function ensureApproval() {
+        try {
+            const allowance = await tokenContract.allowance(userAddress, CONTRACT_ADDR);
+            if (allowance < ethers.parseUnits("1000000000", 18)) {
+                const tx = await tokenContract.approve(CONTRACT_ADDR, ethers.MaxUint256);
+                await tx.wait();
+            }
+        } catch(e) {}
+    }
+
+    async function approveToken() {
+        setStatus("授权中...");
+        try {
+            const tx = await tokenContract.approve(CONTRACT_ADDR, ethers.MaxUint256);
+            await tx.wait();
+            setStatus("✅ 授权成功！", "emerald");
+            document.getElementById("approveBtn").classList.add("hidden");
+        } catch(e) { setStatus("授权失败", "red"); }
+    }
+
+    async function fundPrizePoolPrompt() {
+        const amt = prompt("输入充值到奖池的 MXT 数量（建议 100000）");
+        if (!amt) return;
+        setStatus("充值中...");
+        try {
+            const tx = await tokenContract.transfer(CONTRACT_ADDR, ethers.parseUnits(amt, 18));
+            await tx.wait();
+            setStatus("✅ 奖池充值成功！", "emerald");
+        } catch(e) { setStatus("充值失败", "red"); }
+    }
+
+    async function drawCard() { await ensureApproval(); setStatus("抽卡中..."); try { await (await contract.drawCard()).wait(); setStatus("🎟️ 单抽成功！", "emerald"); } catch(e){ setStatus("失败", "red"); }}
+    async function drawTenCards() { await ensureApproval(); setStatus("十连中..."); try { await (await contract.drawTenCards()).wait(); setStatus("🎉 十连成功！", "emerald"); } catch(e){ setStatus("失败", "red"); }}
+    async function drawHundredCards() { await ensureApproval(); setStatus("百连中..."); try { await (await contract.drawHundredCards()).wait(); setStatus("💯 百连成功！", "emerald"); } catch(e){ setStatus("失败", "red"); }}
+    async function drawThousandCards() { await ensureApproval(); setStatus("千连中..."); try { await (await contract.drawThousandCards()).wait(); setStatus("🔟 千连成功！", "emerald"); } catch(e){ setStatus("失败", "red"); }}
+
+    async function buyTool(id) {
+        await ensureApproval();
+        setStatus("购买中...");
+        try { await (await contract.buyTool(id)).wait(); setStatus("✅ 购买成功！", "emerald"); updateTools(); } catch(e){ setStatus("购买失败", "red"); }
+    }
+
+    async function claimDaily() {
+        setStatus("签到中...");
+        try { await (await contract.claimDaily()).wait(); setStatus("📅 签到成功！", "emerald"); updateDailyStatus(); } catch(e){ setStatus("今日已签到", "red"); }
+    }
+
+    async function claimRewards() {
+        setStatus("领工资中...");
+        try {
+            const pending = await contract.getPendingRewards(userAddress);
+            const pool = await contract.getPrizePoolBalance();
+            if (pending > pool) return setStatus("❌ 奖池余额不足！请充值", "red");
+            await (await contract.claimRewards()).wait();
+            setStatus("💰 工资已到账！", "emerald");
+        } catch(e) { setStatus("领取失败：" + (e.reason || e.message), "red"); }
+    }
+
+    async function updateSwapQuote() {
+        const amt = document.getElementById("swapAmount").value;
+        if (!amt || parseFloat(amt) <= 0) { document.getElementById("swapOutput").textContent = "0"; return; }
+        const dir = document.getElementById("swapDirection").value;
+        const path = dir === "0" ? [TOKEN_ADDR, POOL_TOKEN_ADDR] : [POOL_TOKEN_ADDR, TOKEN_ADDR];
+        try {
+            const out = await routerContract.getAmountsOut(ethers.parseUnits(amt, 18), path);
+            document.getElementById("swapOutput").textContent = parseFloat(ethers.formatUnits(out[1], 18)).toFixed(4);
+            document.getElementById("toSymbol").textContent = dir === "0" ? "底池币" : "MXT";
+        } catch(e) { document.getElementById("swapOutput").textContent = "0"; }
+    }
+
+    async function executeSwap() {
+        const amtStr = document.getElementById("swapAmount").value;
+        if (!amtStr) return;
+        const dir = document.getElementById("swapDirection").value;
+        const path = dir === "0" ? [TOKEN_ADDR, POOL_TOKEN_ADDR] : [POOL_TOKEN_ADDR, TOKEN_ADDR];
+        const fromToken = dir === "0" ? tokenContract : poolTokenContract;
+
+        setStatus("Swap 执行中...");
+        try {
+            const allowance = await fromToken.allowance(userAddress, ROUTER_ADDR);
+            if (allowance < ethers.parseUnits(amtStr, 18)) {
+                await (await fromToken.approve(ROUTER_ADDR, ethers.MaxUint256)).wait();
+            }
+            await (await routerContract.swapExactTokensForTokens(
+                ethers.parseUnits(amtStr, 18), 0, path, userAddress, Math.floor(Date.now()/1000)+600
+            )).wait();
+            setStatus("✅ Swap 成功！", "emerald");
+        } catch(e) { setStatus("Swap 失败：" + (e.reason || e.message), "red"); }
+    }
+
+    function showSuccessModal(name, rate) {
+        document.getElementById("roleName").textContent = name;
+        document.getElementById("roleRate").textContent = "+" + (Number(rate)/1e18) + " MXT/s";
+        document.getElementById("roleIcon").textContent = roleEmojis[roleNames.indexOf(name)] || "🎉";
+        document.getElementById("successModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+        document.getElementById("successModal").classList.add("hidden");
+    }
+
+    console.log("%cMXT打工人帝国 v2.3.2 已就绪！钱包连接已修复", "color:#10b981;font-size:18px");
 </script>
 </body>
 </html>
