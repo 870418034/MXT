@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MXT打工人帝国 - 躺着领工资！</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+    <style>
+        body { background: linear-gradient(135deg, #1e3a8a, #312e81); color: white; font-family: system-ui; }
+        .glass { background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); }
+        .modal { animation: pop 0.3s ease-out; }
+        @keyframes pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full glass rounded-3xl shadow-2xl overflow-hidden">
+        <!-- 头部 -->
+        <div class="bg-gradient-to-r from-yellow-400 to-amber-500 text-black p-6 text-center">
+            <h1 class="text-4xl font-bold">🏢 MXT打工人帝国</h1>
+            <p class="text-lg mt-1">抽卡上班 · 自动产币 · 躺着致富</p>
+        </div>
+
+        <div class="p-6">
+            <!-- 连接钱包 -->
+            <button id="connectBtn"
+                    onclick="connectWallet()"
+                    class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-5 rounded-2xl text-xl transition">
+                连接钱包开始打工
+            </button>
+
+            <!-- 游戏界面（隐藏直到连接） -->
+            <div id="gameUI" class="hidden space-y-6 mt-6">
+
+                <!-- 产出速率 -->
+                <div class="glass p-5 rounded-2xl">
+                    <p class="text-sm opacity-75">我的总产出速率</p>
+                    <p id="rateDisplay" class="text-5xl font-bold text-emerald-400">0 MXT/s</p>
+                </div>
+
+                <!-- 待领工资 -->
+                <div class="glass p-5 rounded-2xl">
+                    <p class="text-sm opacity-75">待领工资（实时刷新）</p>
+                    <p id="pendingDisplay" class="text-4xl font-bold text-amber-400">0 MXT</p>
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="approveToken()" 
+                            class="bg-blue-600 hover:bg-blue-700 py-5 rounded-2xl font-bold text-lg">
+                        🔓 授权 MXT
+                    </button>
+                    <button onclick="drawCard()" 
+                            class="bg-red-600 hover:bg-red-700 py-5 rounded-2xl font-bold text-lg">
+                        🎟️ 抽卡上班<br><span class="text-sm opacity-75">(5000 MXT)</span>
+                    </button>
+                </div>
+
+                <button onclick="claimRewards()" 
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 py-6 rounded-3xl font-bold text-2xl">
+                    💰 下班领工资
+                </button>
+
+                <p id="status" class="text-center text-sm h-6 text-amber-300"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 抽卡成功弹窗 -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="modal glass max-w-xs w-full mx-4 p-8 rounded-3xl text-center">
+            <div id="roleIcon" class="text-7xl mb-4">🎉</div>
+            <p class="text-2xl font-bold" id="roleName">恭喜抽到！</p>
+            <p class="text-emerald-400 text-xl mt-2" id="roleRate">+100 MXT/s</p>
+            <button onclick="closeModal()" 
+                    class="mt-8 bg-white text-black px-10 py-3 rounded-2xl font-bold">
+                继续打工
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 配置区 ====================
+        const CONTRACT_ADDR = "0xe95C28E1bd7bd52E76c6d295dc8209Ff75c6d1E3";   // ←←← 部署后改成你的合约地址
+        const TOKEN_ADDR = "0xe73ABa3306e912eD507C55B440C75bB4827183Df";
+        const CHAIN_ID = 56; // BSC 主网
+
+        // ==================== 完整 ABI ====================
+        const CONTRACT_ABI = [
+            {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"string","name":"roleName","type":"string"},{"indexed":false,"internalType":"uint256","name":"rate","type":"uint256"}],"name":"CardDrawn","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"RewardClaimed","type":"event"},
+            {"inputs":[],"name":"drawCard","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getPendingRewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"getMyProductionRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"emergencyWithdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"players","outputs":[{"internalType":"uint256","name":"productionRate","type":"uint256"},{"internalType":"uint256","name":"lastClaimTime","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"DRAW_COST","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}
+        ];
+
+        const TOKEN_ABI = [
+            {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}
+        ];
+
+        // ==================== 全局变量 ====================
+        let provider, signer, contract, tokenContract, userAddress;
+        let updateInterval;
+
+        // ==================== 工具函数 ====================
+        function setStatus(msg, color = "amber") {
+            const el = document.getElementById("status");
+            el.textContent = msg;
+            el.className = `text-center text-sm h-6 text-${color}-300`;
+        }
+
+        async function ensureCorrectChain() {
+            const network = await provider.getNetwork();
+            if (network.chainId !== CHAIN_ID) {
+                alert("请切换到 BSC 主网（BNB Smart Chain）！");
+                return false;
+            }
+            return true;
+        }
+
+        // ==================== 连接钱包 ====================
+        async function connectWallet() {
+            if (!window.ethereum) {
+                alert("请安装 MetaMask / TokenPocket / Trust Wallet！");
+                return;
+            }
+            try {
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                contract = new ethers.Contract(CONTRACT_ADDR, CONTRACT_ABI, signer);
+                tokenContract = new ethers.Contract(TOKEN_ADDR, TOKEN_ABI, signer);
+
+                // 监听抽卡事件（实时显示角色）
+                contract.on("CardDrawn", (player, roleName, rate) => {
+                    if (player.toLowerCase() === userAddress.toLowerCase()) {
+                        showSuccessModal(roleName, rate);
+                    }
+                });
+
+                await ensureCorrectChain();
+                document.getElementById("connectBtn").classList.add("hidden");
+                document.getElementById("gameUI").classList.remove("hidden");
+
+                setStatus("✅ 连接成功！开始打工吧", "emerald");
+                startRealTimeUpdate();
+            } catch (e) {
+                setStatus("连接失败：" + e.message);
+            }
+        }
+
+        // ==================== 实时刷新待领工资 ====================
+        function startRealTimeUpdate() {
+            if (updateInterval) clearInterval(updateInterval);
+            updateInterval = setInterval(async () => {
+                if (!contract || !userAddress) return;
+                try {
+                    const rate = await contract.getMyProductionRate();
+                    const pending = await contract.getPendingRewards(userAddress);
+                    document.getElementById("rateDisplay").textContent = 
+                        (Number(rate) / 1e18).toFixed(2) + " MXT/s";
+                    document.getElementById("pendingDisplay").textContent = 
+                        (Number(pending) / 1e18).toFixed(4) + " MXT";
+                } catch {}
+            }, 1000);
+        }
+
+        // ==================== 授权 ====================
+        async function approveToken() {
+            if (!tokenContract) return;
+            setStatus("正在授权...");
+            try {
+                const tx = await tokenContract.approve(CONTRACT_ADDR, ethers.MaxUint256);
+                await tx.wait();
+                setStatus("✅ 授权成功！可以抽卡了", "emerald");
+            } catch (e) {
+                setStatus("授权失败：" + e.message);
+            }
+        }
+
+        // ==================== 抽卡 ====================
+        async function drawCard() {
+            if (!contract) return;
+            setStatus("抽卡中...");
+            try {
+                const tx = await contract.drawCard();
+                await tx.wait();
+                setStatus("🎟️ 抽卡交易已上链！等待事件显示角色...", "emerald");
+            } catch (e) {
+                setStatus("抽卡失败：" + e.message);
+            }
+        }
+
+        // ==================== 领工资 ====================
+        async function claimRewards() {
+            if (!contract) return;
+            setStatus("领工资中...");
+            try {
+                const tx = await contract.claimRewards();
+                await tx.wait();
+                setStatus("💰 工资已到账！", "emerald");
+            } catch (e) {
+                setStatus("领取失败：" + e.message);
+            }
+        }
+
+        // ==================== 抽卡成功弹窗 ====================
+        function showSuccessModal(roleName, rate) {
+            document.getElementById("roleName").textContent = roleName;
+            document.getElementById("roleRate").textContent = "+" + (Number(rate) / 1e18) + " MXT/s";
+            document.getElementById("successModal").classList.remove("hidden");
+            document.getElementById("roleIcon").textContent = getRoleEmoji(roleName);
+        }
+
+        function getRoleEmoji(name) {
+            const map = {"实习生":"👶","打工人":"🧑‍💼","程序员":"💻","销售精英":"📈","项目经理":"📋","部门主管":"👔","老板":"🧔","CEO":"👑"};
+            return map[name] || "🎉";
+        }
+
+        function closeModal() {
+            document.getElementById("successModal").classList.add("hidden");
+        }
+
+        // 页面加载提示
+        console.log("%cMXT打工人帝国前端已就绪！请先部署合约再替换地址", "color:#10b981; font-size:14px");
+    </script>
+</body>
+</html>
